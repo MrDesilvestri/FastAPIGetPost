@@ -83,23 +83,22 @@ def get_records():
         raise HTTPException(500, str(e))
 
 @app.post("/create_record/")
-def create_record(registro: Registro):
+def create_record(record: dict):
     try:
-
         api_url = os.environ.get('postapi')
+        api_key = os.environ.get('API_KEY')
 
-        headers = {
-            'xc-token': API_KEY,
-            'Content-Type': "application/json"
-        }
+        if api_url is None:
+            raise HTTPException(500, "La variable de entorno 'postapi' no está configurada.")
+        if api_key is None:
+            raise HTTPException(500, "La variable de entorno 'API_KEY' no está configurada.")
 
-        response = requests.post(api_url, data=registro.json(), headers=headers)
+        headers = {'xc-token': api_key, 'Content-Type': 'application/json'}
+        response = requests.post(api_url, json=record, headers=headers)
 
-        # Verifica si la solicitud fue exitosa
-        if response.status_code == 200 or response.status_code == 201:
-            return response.json()
-        else:
-            raise HTTPException(status_code=response.status_code, detail=response.text)
+        if response.status_code != 200:
+            raise HTTPException(response.status_code, response.text)
 
+        return response.json()
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(500, str(e))
