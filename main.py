@@ -2,6 +2,8 @@ import http
 import json
 from http.client import HTTPException
 import pandas as pd
+import os
+from dotenv import load_dotenv
 
 
 from fastapi import FastAPI
@@ -10,6 +12,7 @@ import requests
 import json
 from pydantic import BaseModel
 
+load_dotenv()
 app = FastAPI()
 
 # Definición del modelo de datos
@@ -21,7 +24,7 @@ class Registro(BaseModel):
 async def root():
     return {"message": "Hello World"}
 
-API_KEY = "Req04A-Id0HJN2xcVlAEZiOAP6IYlTgGES3ySakg"
+API_KEY = os.environ.get('Api_Key')
 
 @app.get("/get_records/")
 def get_records():
@@ -33,7 +36,7 @@ def get_records():
         headers = {'xc-token': API_KEY}  # Asegúrate de reemplazar con tu API Key
 
         # Realizar la solicitud GET
-        conn.request("GET", "/api/v2/tables/m1dcf9vabgqnrun/records?offset=0&limit=25&where=&viewId=vwjsp4cdzqklgf3b", headers=headers)
+        conn.request("GET", os.environ.get('getapi'), headers=headers)
 
         # Obtener la respuesta
         res = conn.getresponse()
@@ -70,7 +73,7 @@ def get_records():
 def create_record(registro: Registro):
     try:
 
-        api_url = "https://app.nocodb.com/api/v2/tables/m1dcf9vabgqnrun/records"
+        api_url = os.environ.get('postapi')
 
         headers = {
             'xc-token': API_KEY,
