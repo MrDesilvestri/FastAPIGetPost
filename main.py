@@ -29,14 +29,24 @@ API_KEY = os.environ.get('Api_Key')
 @app.get("/get_records/")
 def get_records():
     try:
+        # Verifica que la variable de entorno 'getapi' esté configurada
+        api_url = os.environ.get('getapi')
+        if api_url is None:
+            raise ValueError("La variable de entorno 'getapi' no está configurada.")
+
+        # Verifica que la variable de entorno 'API_KEY' esté configurada
+        api_key = os.environ.get('API_KEY')
+        if api_key is None:
+            raise ValueError("La variable de entorno 'API_KEY' no está configurada.")
+
         # Establece la conexión HTTPS con la API de NoCoDB
         conn = http.client.HTTPSConnection("app.nocodb.com")
 
         # Encabezados con el token de autenticación
-        headers = {'xc-token': os.environ.get('API_KEY')}  # Asegúrate de reemplazar con tu API Key
+        headers = {'xc-token': api_key}
 
         # Realizar la solicitud GET
-        conn.request("GET", os.environ.get('getapi'), headers=headers)
+        conn.request("GET", api_url, headers=headers)
 
         # Obtener la respuesta
         res = conn.getresponse()
@@ -68,6 +78,9 @@ def get_records():
         else:
             return {"message": "No data available."}
 
+    except ValueError as ve:
+        print("Error de configuración:", str(ve))  # Debugging
+        raise HTTPException(500, str(ve))
     except Exception as e:
         print("Error:", str(e))  # Debugging
         raise HTTPException(500, str(e))
