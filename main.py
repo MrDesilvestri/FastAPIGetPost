@@ -31,6 +31,7 @@ def get_records():
     try:
         # Verifica que la variable de entorno 'getapi' esté configurada
         api_url = os.environ.get('getapi')
+        print("getapi:", api_url)
         if api_url is None:
             raise ValueError("La variable de entorno 'getapi' no está configurada.")
 
@@ -52,12 +53,10 @@ def get_records():
         res = conn.getresponse()
         data = res.read()
         lista = data.decode("utf-8")
-        print("Respuesta de la API:", lista)  # Debugging
 
         # Verifica si la respuesta es JSON
         try:
             json_object = json.loads(lista)
-            print("Objeto JSON:", json_object)  # Debugging
         except json.JSONDecodeError:
             raise HTTPException(500, "Failed to decode JSON response: " + lista)
 
@@ -68,12 +67,10 @@ def get_records():
         for clave in json_object:
             if clave == "list":
                 cadenaasistentes = json_object[clave]
-                print("Lista de asistentes:", cadenaasistentes)  # Debugging
 
         # Convertir a DataFrame
         if cadenaasistentes:
             df = pd.DataFrame(cadenaasistentes, columns=['Title', 'Content'])
-            print("DataFrame:", df)  # Debugging
             return df.to_dict(orient="records")
         else:
             return {"message": "No data available."}
