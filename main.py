@@ -33,7 +33,7 @@ def get_records():
         conn = http.client.HTTPSConnection("app.nocodb.com")
 
         # Encabezados con el token de autenticación
-        headers = {'xc-token': API_KEY}  # Asegúrate de reemplazar con tu API Key
+        headers = {'xc-token': os.environ.get('API_KEY')}  # Asegúrate de reemplazar con tu API Key
 
         # Realizar la solicitud GET
         conn.request("GET", os.environ.get('getapi'), headers=headers)
@@ -44,9 +44,12 @@ def get_records():
         lista = data.decode("utf-8")
         print("Respuesta de la API:", lista)  # Debugging
 
-        # Cargar JSON a un objeto Python
-        json_object = json.loads(lista)
-        print("Objeto JSON:", json_object)  # Debugging
+        # Verifica si la respuesta es JSON
+        try:
+            json_object = json.loads(lista)
+            print("Objeto JSON:", json_object)  # Debugging
+        except json.JSONDecodeError:
+            raise HTTPException(status_code=500, detail="Failed to decode JSON response: " + lista)
 
         # Inicializar la variable cadenaasistentes
         cadenaasistentes = []
@@ -67,7 +70,7 @@ def get_records():
 
     except Exception as e:
         print("Error:", str(e))  # Debugging
-        raise HTTPException(500, str(e))
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/create_record/")
 def create_record(registro: Registro):
