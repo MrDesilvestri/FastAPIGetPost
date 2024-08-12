@@ -49,7 +49,7 @@ def get_records():
             json_object = json.loads(lista)
             print("Objeto JSON:", json_object)  # Debugging
         except json.JSONDecodeError:
-            raise HTTPException(status_code=500, detail="Failed to decode JSON response: " + lista)
+            raise HTTPException(500, "Failed to decode JSON response: " + lista)
 
         # Inicializar la variable cadenaasistentes
         cadenaasistentes = []
@@ -70,7 +70,7 @@ def get_records():
 
     except Exception as e:
         print("Error:", str(e))  # Debugging
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(500, str(e))
 
 @app.post("/create_record/")
 def create_record(registro: Registro):
